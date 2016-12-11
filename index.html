@@ -1,45 +1,50 @@
 <!DOCTYPE html>
-
 <html>
-
-<head>
+  <head>
     <title>TP - Neighborhood Map</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1, width=device-width">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style.css">
     <script src="js/jquery.min.js"></script>
     <script src="js/knockout.js"></script>
-</head>
-
-<body>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 80%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
     <header>
         <h1>Tourist Hotspots - Mumbai</h1>
     </header>
     <div id="map"></div>
 
-    <div class="search-box" id="search-box">
-        <input class="search-area" placeholder="Search..." type="text" name="q" data-bind="value: query, valueUpdate: 'keyup'">
-        <ul class="location-list" data-bind="visible:query, template: {name: 'location', foreach: search}">
-        </ul>
-    </div>
 
     <script type="text/html" id="location">
         <li class="location-box" data-bind="text: title, click: openInfowindow"></li>
     </script>
-
     <script>
-        var map;
-
-        var initMap= function () {
-            map= new google.maps.Map(document.getElementById('map'), {
-                center: {lat: 19.0760, lng: 72.8777},
-                zoom: 15,disableDefaultUI: true
-
-            });
-        }
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 19.075984, lng: 72.877656},
+          zoom: 13,
+        });
+        var viewModel = new ViewModel();
+        ko.applyBindings(viewModel);
+      }
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap"
+    async defer></script>
     <script src="js/main.js"></script>
-</body>
+  </body>
 </html>
