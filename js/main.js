@@ -1,9 +1,21 @@
+    // If Google maps API fails to load then throw this error
+var gmapError = function() {
+    self.error_message('Failed to load Google Maps API');
+    self.apiError(true);
+};
+
+// If Foursquare API fails to load then throw this error
+var FoursquareError = function() {
+    self.error_message('Failed to load Foursquare API');
+    self.apiError(true);
+};
+
 // Model
 
 // Location Database (where markers are to be placed)
 var Location = function(name, venueID, lat, lng) {
     var self = this;
-    console.log('creating location');
+    //console.log('creating location'); //Check
     this.name = name;
     this.venueID = venueID;
     this.lat = lat;
@@ -41,7 +53,7 @@ var Location = function(name, venueID, lat, lng) {
             infowindow.open(map, marker);
             // Make sure the marker property is cleared if the infowindow is closed.
             infowindow.addListener('closeclick', function() {
-            infowindow.setMarker(null);
+            infowindow.setMarker = null;
             });
         }
     }
@@ -58,6 +70,7 @@ var Location = function(name, venueID, lat, lng) {
         return markerImage;
     }
 
+
     // at first don't bother with the 4SQ API, just play with the markers and infowindows
     //
     //getInfo function retrives data from Foursquare API for the selected location
@@ -67,11 +80,20 @@ var Location = function(name, venueID, lat, lng) {
         var FoursquareUrl = "https://api.foursquare.com/v2/venues/" + venueID + "?client_id=" + clientID + "&client_secret=" + clientSecret + "";
 
         // jQuery documentation: http://api.jquery.com/jquery.ajax/
-        $.ajax({ /* query the API here */ })
-            .done(function(response) { /* this function will be called on a success */ })
-            .fail(function(error) { /* this function will be called in case of a problem */ });
-    }
-}
+        $.ajax({ /* query the API here */
+            url: FoursquareUrl,
+            dataType: "json",
+            async: true
+        })
+            .done(function(response) { /* this function will be called on a success */
+
+
+            })
+            .fail(function(error) { /* this function will be called in case of a problem */
+                FoursquareError();
+            });
+    };
+};
 
 
 
@@ -104,4 +126,5 @@ var ViewModel = function() {
         ],
         query: ko.observable(' '),
     };
+
 };

@@ -27,6 +27,8 @@
         <h1>Tourist Hotspots - Mumbai</h1>
     </header>
     <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap" onerror="gmapError()"
+    async defer></script>
 
 
     <script type="text/html" id="location">
@@ -37,14 +39,14 @@
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 19.075984, lng: 72.877656},
-          zoom: 13,
+          zoom: 11
         });
         var viewModel = new ViewModel();
         ko.applyBindings(viewModel);
       }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap"
-    async defer></script>
+<!--     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap" onerror="gmapError()"
+async defer></script> -->
     <script src="js/main.js"></script>
   </body>
 </html>
