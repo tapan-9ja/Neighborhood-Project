@@ -1,8 +1,8 @@
     // If Google maps API fails to load then throw this error
-var gmapError = function() {
+/*var gmapError = function() {
     self.error_message('Failed to load Google Maps API');
     self.apiError(true);
-};
+};*/
 
 // If Foursquare API fails to load then throw this error
 var FoursquareError = function() {
@@ -49,7 +49,8 @@ var Location = function(name, venueID, lat, lng) {
         // Check to make sure the infowindow is not already opened on this marker.
         if (infowindow.marker != marker) {
             infowindow.marker = marker;
-            infowindow.setContent('<div>' + marker.name + ' ' + marker.position + '</div>');
+            //infowindow.setContent('<div>' + marker.name + ' ' + marker.position + '</div>');
+            infowindow.setContent(self.info);
             infowindow.open(map, marker);
             // Make sure the marker property is cleared if the infowindow is closed.
             infowindow.addListener('closeclick', function() {
@@ -77,7 +78,8 @@ var Location = function(name, venueID, lat, lng) {
     this.getInfo = function() {
         var clientID = "05EEJUP44W0Z1GTQPIDWQL0S0ZOW2FD5UQQFX3P3CCGSDKE0";
         var clientSecret = "42WSQ4GINX0ENYC01G020AFSHOJYUE35JBK2XXR0G1ZXFQJX";
-        var FoursquareUrl = "https://api.foursquare.com/v2/venues/" + venueID + "?client_id=" + clientID + "&client_secret=" + clientSecret + "";
+        var tips = [];
+        var FoursquareUrl = "https://api.foursquare.com/v2/venues/" + self.venueID + "/tips?sort=popular&limit=3&v=20161212?client_id=" + clientID +"&client_secret=" + clientSecret + "";
 
         // jQuery documentation: http://api.jquery.com/jquery.ajax/
         $.ajax({ /* query the API here */
@@ -85,15 +87,18 @@ var Location = function(name, venueID, lat, lng) {
             dataType: "json",
             async: true
         })
-            .done(function(response) { /* this function will be called on a success */
-
-
+            .success(function(data) { /* this function will be called on a success */
+                $each(data.response.tips.items, function(i, tips) {
+                    tips.push('<li>' + tips.text + '</li>');
+                self.info = '<h3>' + self.name + '</h3>' +'<h4>Top Tips</h34>' + '<ol class="tips">' + tips.join('') + '</ol>';
+                console.log('4sq working');
+                });
             })
-            .fail(function(error) { /* this function will be called in case of a problem */
+            .error(function(data) { /* this function will be called in case of a problem */
                 FoursquareError();
             });
-    };
-};
+    }
+}
 
 
 
@@ -103,7 +108,7 @@ var ViewModel = function() {
     var self = this;
     self.query = ko.observable('');
     //Array containing loaction information
-    var locationInfo = {
+    this.locationInfo = {
         location: [
             new Location('Marine Drive', '4b0587d1f964a520d1a222e3', 18.938358, 72.824038), //1
             new Location('Essel World', '4b0587e6f964a5205da622e3', 19.230973, 72.806482), //2
@@ -128,3 +133,6 @@ var ViewModel = function() {
     };
 
 };
+
+
+ko.applyBindings(locationInfo);
