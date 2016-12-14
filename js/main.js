@@ -79,7 +79,7 @@ var Location = function(name, venueID, lat, lng) {
         var clientID = "05EEJUP44W0Z1GTQPIDWQL0S0ZOW2FD5UQQFX3P3CCGSDKE0";
         var clientSecret = "42WSQ4GINX0ENYC01G020AFSHOJYUE35JBK2XXR0G1ZXFQJX";
         var tips = [];
-        var FoursquareUrl = "https://api.foursquare.com/v2/venues/" + self.venueID + "/tips?sort=popular&limit=3&v=20161212?client_id=" + clientID +"&client_secret=" + clientSecret + "";
+        var FoursquareUrl = 'https://api.foursquare.com/v2/venues/' + self.venueID + '/tips?sort=popular&limit=3&v=20161212&client_id=' + clientID +'&client_secret=' + clientSecret + ' ';
 
         // jQuery documentation: http://api.jquery.com/jquery.ajax/
         $.ajax({ /* query the API here */
@@ -133,6 +133,3 @@ var ViewModel = function() {
     };
 
 };
-
-
-ko.applyBindings(locationInfo);
