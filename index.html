@@ -1,34 +1,33 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>TP - Neighborhood Map</title>
+    <title>Mumbai Tourist Map - TP</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/jquery.min.js"></script>
     <script src="js/knockout.js"></script>
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 80%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
   </head>
   <body>
+
     <header>
-        <h1>Tourist Hotspots - Mumbai</h1>
+        <h1>Welcome to Mumbai !!!</h1>
+        <hr>
     </header>
+
+    <div class="navlist">
+        <input type="text" class="search" data-bind="textInput: query" placeholder="Type here...">
+        <ul data-bind="foreach: filteredLocations">
+            <li class="location_name"><a href="#" class="location_name" data-bind="text: name"></a></li>
+        </ul>
+
+    </div>
+
+
+
     <div id="map"></div>
     <script onerror="gmapError()" async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap"></script>
-
 
     <script type="text/html" id="location">
         <li class="location-box" data-bind="text: title, click: openInfowindow"></li>
@@ -37,20 +36,23 @@
       var map;
 
       var gmapError = function() {
-      self.error_message('Failed to load Google Maps API');
-      self.apiError(true);
+      var mapTimeout = setTimeout(function() {
+        alert("Unable to load Google Maps.");
+        }, 5000);
 };
+
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 19.075984, lng: 72.877656},
+          center: {lat: 19.0760, lng: 72.8777},
           zoom: 11
         });
+        clearTimeout(gmapError);
+
         var viewModel = new ViewModel();
         ko.applyBindings(viewModel);
       }
     </script>
-<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeAOPkMWnZhHp2eYUFMNUoxIjv6PqsIe0&callback=initMap" onerror="gmapError()"
-async defer></script> -->
+
     <script src="js/main.js"></script>
   </body>
 </html>

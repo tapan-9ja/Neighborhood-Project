@@ -1,18 +1,7 @@
-    // If Google maps API fails to load then throw this error
-/*var gmapError = function() {
-    self.error_message('Failed to load Google Maps API');
-    self.apiError(true);
-};*/
-
-// If Foursquare API fails to load then throw this error
-var FoursquareError = function() {
-    self.error_message('Failed to load Foursquare API');
-    self.apiError(true);
-};
 
 // Model
 
-// Location Database (where markers are to be placed)
+// Location Database
 var Location = function(name, venueID, lat, lng) {
     var self = this;
     //console.log('creating location'); //Check
@@ -28,6 +17,7 @@ var Location = function(name, venueID, lat, lng) {
     });
     // Creating an infowindow object
     var infowindow = new google.maps.InfoWindow();
+    this.infoWindow = infowindow;
 
     //Icon change/animation
     var defaultIcon = makeMarkerIcon('FE7569');
@@ -35,7 +25,10 @@ var Location = function(name, venueID, lat, lng) {
 
     // Creating event listner for infoWindow
     this.marker.addListener('click', function() {
-        populateInfoWindow(this, infowindow);
+        self.infoWindow.setContent('Loading...');
+        self.infoWindow.open(map, self.marker);
+        self.getInfo();
+        // populateInfoWindow(this, infowindow);
     });
     this.marker.addListener('mouseover', function() {
         this.setIcon(highlightedIcon);
@@ -49,8 +42,6 @@ var Location = function(name, venueID, lat, lng) {
         // Check to make sure the infowindow is not already opened on this marker.
         if (infowindow.marker != marker) {
             infowindow.marker = marker;
-            //infowindow.setContent('<div>' + marker.name + ' ' + marker.position + '</div>');
-            infowindow.setContent(self.info);
             infowindow.open(map, marker);
             // Make sure the marker property is cleared if the infowindow is closed.
             infowindow.addListener('closeclick', function() {
@@ -72,64 +63,72 @@ var Location = function(name, venueID, lat, lng) {
     }
 
 
-    // at first don't bother with the 4SQ API, just play with the markers and infowindows
-    //
     //getInfo function retrives data from Foursquare API for the selected location
     this.getInfo = function() {
         var clientID = "05EEJUP44W0Z1GTQPIDWQL0S0ZOW2FD5UQQFX3P3CCGSDKE0";
         var clientSecret = "42WSQ4GINX0ENYC01G020AFSHOJYUE35JBK2XXR0G1ZXFQJX";
-        var tips = [];
-        var FoursquareUrl = 'https://api.foursquare.com/v2/venues/' + self.venueID + '/tips?sort=popular&limit=3&v=20161212&client_id=' + clientID +'&client_secret=' + clientSecret + ' ';
+        var FsqUrl = "https://api.foursquare.com/v2/venues/"+self.venueID+"?client_id="+clientID+"&client_secret="+clientSecret+"&v=20161213";
 
-        // jQuery documentation: http://api.jquery.com/jquery.ajax/
-        $.ajax({ /* query the API here */
-            url: FoursquareUrl,
+        $.ajax({
+            url: FsqUrl,
             dataType: "json",
             async: true
         })
-            .success(function(data) { /* this function will be called on a success */
-                $each(data.response.tips.items, function(i, tips) {
-                    tips.push('<li>' + tips.text + '</li>');
-                self.info = '<h3>' + self.name + '</h3>' +'<h4>Top Tips</h34>' + '<ol class="tips">' + tips.join('') + '</ol>';
-                console.log('4sq working');
-                });
+            .done(function(data) {
+                //console.log(data);//check
+                var rating = data.response.venue.rating;
+                var tip = data.response.venue.tips.groups[0].items[0].text;
+                content4sq= '<h3>' + name + '</h3>'+'<p>' + '<h4> Rating: </h4>' + rating +'</p>'+'<p>' + '<h4> Tip: </h4>'+ tip +'</p>';
+                self.infoWindow.setContent(content4sq);
+                self.infoWindow.open(map, self.marker);
             })
-            .error(function(data) { /* this function will be called in case of a problem */
-                FoursquareError();
+            .fail(function(data) {
+                alert('Error loading Foursquare Data');
             });
-    }
-}
 
+};
+};
 
 
 // View Model
-//
+
 var ViewModel = function() {
     var self = this;
     self.query = ko.observable('');
-    //Array containing loaction information
+
+    //Array containing location information
     this.locationInfo = {
         location: [
             new Location('Marine Drive', '4b0587d1f964a520d1a222e3', 18.938358, 72.824038), //1
             new Location('Essel World', '4b0587e6f964a5205da622e3', 19.230973, 72.806482), //2
             new Location('Gateway Of India', '4b0587d1f964a520cea222e3', 18.922248, 72.834622), //3
-            new Location('Wankhede Stadium', '4b0587dbf964a5207da422e3', 18.931011, 72.824852), //4
-            new Location('Sanjay Gandhi National Park', '4b0587d1f964a520d8a222e3', 19.232800, 72.864075), //5
-            new Location('Worli Sea Face', '4b7fecb5f964a520c04430e3', 19.009320, 72.815079), //6
-            new Location('Juhu Beach', '4d0d00a6f393224bbadc19ee', 19.097188, 72.826557), //7
-            new Location('Mount Mary Church', '4b0587d2f964a520f3a222e3', 19.046538, 72.822417), //8
-            new Location('Haji Ali Dargah', '4dc0d7281838710f436fa414', 18.982759, 72.808859), //9
-            new Location('Siddhivinayak Temple', '4b0587e4f964a520fba522e3', 19.017915, 72.832019), //10
-            new Location('Hanging Garden', '4b0587d1f964a520e2a222e3', 18.957086, 72.804802), //11
-            new Location('Powai Lake Promenade', '4c7e3fffb33a224bca42da81', 19.119931, 72.902955), //12
-            new Location('Aksa Beach', '4b0587d3f964a5202aa322e3', 19.175975, 72.795096), //13
-            new Location('Bandra Promenade', '4ba62853f964a520dd3739e3', 19.050631, 72.821449), //14
-            new Location('Film City', '4b0587d1f964a520e6a222e3', 19.162949, 72.883660), //15
-            new Location('Nehru Planetarium', '4b0587e6f964a5205ea622e3', 18.989437, 72.813913), //16
-            new Location('Prince Of Wales Museum', '4b0587d1f964a520cfa222e3', 18.926893, 72.832592), //17
-            new Location('Jehangir Art Gallery', '4b0587d3f964a5203ca322e3', 18.927476, 72.831682), //18
+            new Location('Sanjay Gandhi National Park', '4b0587d1f964a520d8a222e3', 19.232800, 72.864075), //4
+            new Location('Juhu Beach', '4d0d00a6f393224bbadc19ee', 19.097188, 72.826557), //5
+            new Location('Hanging Garden', '4b0587d1f964a520e2a222e3', 18.957086, 72.804802), //6
+            new Location('Film City', '4b0587d1f964a520e6a222e3', 19.162949, 72.883660), //7
+            new Location('Mount Mary Church', '4b0587d2f964a520f3a222e3', 19.046538, 72.822417),//8
+            new Location('Nehru Planetarium', '4b0587e6f964a5205ea622e3', 18.989437, 72.813913), //9
+            new Location('Jehangir Art Gallery', '4b0587d3f964a5203ca322e3', 18.927476, 72.831682), //10
+            new Location('Aksa Beach', '4b0587d3f964a5202aa322e3', 19.175975, 72.795096), //11
         ],
         query: ko.observable(' '),
     };
+
+    self.filteredLocations = ko.computed(function() {
+        var filteredArray = [];
+        for (var i = self.locationInfo.location.length - 1; i >= 0; i--) {
+            var location = self.locationInfo.location[i];
+            var name = location.name;
+            if (name.indexOf(self.query()) > -1) {
+                filteredArray.push(location);
+                // show the marker
+                location.marker.setVisible(true);
+            } else {
+                // hide the marker
+                location.marker.setVisible(false);
+            }
+        }
+        return filteredArray;
+    });
 
 };
